@@ -5,9 +5,12 @@ import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const REMEMBER_COOKIE = "opsync_remember_me";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -16,6 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    document.cookie = `${REMEMBER_COOKIE}=${rememberMe ? "1" : "0"}; path=/${rememberMe ? "; max-age=31536000" : ""}`;
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
@@ -50,6 +54,15 @@ export default function LoginPage() {
           required
           style={{ padding: "0.5rem", fontSize: "1rem" }}
         />
+        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            style={{ width: "1rem", height: "1rem" }}
+          />
+          Remember me
+        </label>
         {error && <p style={{ color: "crimson", fontSize: "0.9rem" }}>{error}</p>}
         <button type="submit" disabled={loading} style={{ padding: "0.5rem 1rem", fontSize: "1rem" }}>
           {loading ? "Signing in..." : "Sign in"}
@@ -57,6 +70,9 @@ export default function LoginPage() {
       </form>
       <p style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
         No account? <Link href="/signup">Sign up</Link>
+      </p>
+      <p style={{ marginTop: "0.5rem", fontSize: "0.9rem" }}>
+        <Link href="/forgot-password">Forgot password?</Link>
       </p>
     </main>
   );
