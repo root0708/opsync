@@ -65,8 +65,12 @@ export default function DataPage() {
         },
         body: JSON.stringify({ name: uploadName.trim(), csv }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data.error || `Upload failed (${res.status})`;
+        const hint = data.hint ? ` — ${data.hint}` : "";
+        throw new Error(msg + hint);
+      }
       setLists((prev) => [{ ...data, created_at: new Date().toISOString() }, ...prev]);
       setUploadName("");
       setUploadFile(null);
