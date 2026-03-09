@@ -14,7 +14,21 @@ import { meRouter } from "./routes/me.js";
 const app = express();
 const port = Number(process.env.PORT) || 4000;
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000", credentials: true }));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://opsync-web.vercel.app",
+  ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
+];
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app"))
+        cb(null, true);
+      else cb(null, false);
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use("/api/v1/health", healthRouter);
