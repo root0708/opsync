@@ -10,6 +10,7 @@ import { createClient } from "@supabase/supabase-js";
 import { authMiddleware } from "./middleware/auth.js";
 import { healthRouter } from "./routes/health.js";
 import { meRouter } from "./routes/me.js";
+import { listsRouter } from "./routes/lists.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 4000;
@@ -33,6 +34,7 @@ app.use(express.json());
 
 app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/me", authMiddleware, meRouter);
+app.use("/api/v1/lists", authMiddleware, listsRouter);
 
 app.listen(port, () => {
   console.log(`OPSYNC API listening on http://localhost:${port}`);
